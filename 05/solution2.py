@@ -21,7 +21,19 @@ def test_solution_with_log(upd):
 def reduced_list(lst, number):
     return [ item for item in lst if item != number ]
 
+def intersection(lst1, lst2):
+    return list(set(lst1) & set(lst2))
+
 def find_best_value(start, _pool, choices, solution, _len):
+    
+    solution.append(start)
+    
+    # print(f"start : {start}")
+    # print(f"Solution: {solution}")
+    # print(f"Choices: {choices}")
+    # print(f"pool:  {_pool}")
+
+    # print("--------------------------------")
     
     # Si ya tenemos una solucion valida
     if len(solution) == _len:
@@ -33,21 +45,25 @@ def find_best_value(start, _pool, choices, solution, _len):
 
     if len(choices) == 0:
         return False, []
-    else:
-        solution.append(start)
-        for x in choices:
-            # Las nuevas posibilidades son las que hayan en el diccionario que coincidan
-            # con valores que no están ya quitados del pool
-            ok, result = find_best_value(
-                x,
-                reduced_list(_pool, x),
-                [ item for item in reduced_list(_pool, x) if item in rules_dict[x] ],
-                solution,
-                _len
-            )
-            if ok:
-                return True, result
+    
+    if len(intersection(choices, _pool)) == 0:
         return False, []
+    
+    for y in choices:
+        # Las nuevas posibilidades son las que hayan en el diccionario que coincidan
+        # con valores que no están ya quitados del pool
+        ok, result = find_best_value(
+            y,
+            reduced_list(_pool, y),
+            [ item for item in reduced_list(_pool, y) if item in rules_dict[y] ],
+            solution,
+            _len
+        )
+        if ok:
+            return True, result
+        else:
+            solution.pop()
+    return False, []
 
 fname = "input.rules.txt"
 rules_list = []
@@ -55,8 +71,7 @@ with open(fname) as file:
     for line in file:
         rules_list.append(line.strip())
 
-fname = "input.test.2.txt"
-count = 0
+fname = "input.txt"
 upd_to_fix = []
 with open(fname) as file:
     for line in file:
@@ -72,6 +87,7 @@ for rule in rules_list:
     rules_dict.setdefault(pair[0], [])
     rules_dict[pair[0]].append(pair[1])
 
+count = 0
 for upd in upd_to_fix:
     pool = upd.split("|")
     # Empezamos a iterar. Hay que probar que todos los numeros puedan
@@ -85,10 +101,10 @@ for upd in upd_to_fix:
             reduced_list(pool, x),
             [ item for item in reduced_list(pool, x) if item in rules_dict[x] ],
             solution,
-            len(pool))
+            len(pool)
+        )
         if ok:
-            solution = result
+            count += int(solution[len(solution)//2])
             break
-
-    print(f"Solucion: {solution}")
-    print(f"Es correcta {test_solution_with_log('|'.join(solution))}")
+        
+print(count)
