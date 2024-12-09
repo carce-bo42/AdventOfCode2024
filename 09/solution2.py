@@ -1,13 +1,5 @@
 import copy
 
-
-def get_last_nonempty_element(disk):
-
-    for idx, pair in enumerate(reversed(disk)):
-        if pair[0] != -1:
-            return (len(disk) -1) - idx
-
-# Solo busco por la ixquierda
 def search_space(disk, idx_max, amount):
 
     for idx, pair in enumerate(disk):
@@ -26,19 +18,6 @@ def find_index(disk, unique_pair):
     for idx, pair in enumerate(disk):
         if pair == unique_pair:
             return idx
-
-# Esto seguramente no haga falta.
-# Pero cuando hemos copiado un nodo a otro lugar, deberíamos
-# limpiar la procedencia:
-# [ -1, 2 ], [ -1, 3 ] == [ -1, 5 ]
-
-def print_solution(disk):
-    for id, value in disk:
-        if id != -1:
-            print(f"{str(id)*value}", end="")
-        else:
-            print("."*value, end="")
-    print("")
 
 disk_original = []
 
@@ -59,17 +38,9 @@ for idx, pair in enumerate(reversed(disk_original)):
 
     if pair[0] != -1:
 
-        # El index original es el inverso, pero teniendo en cuenta cuando
-        # partimos [-1, 5] -> [3, 4], [-1, 1]. Aqui aparece una nueva entrada.
-        # Si esta entrada esta antes o despues del numero siguiente que conseguiremos
-        # mover, no lo sabemos. Asi que buscamos el indice y listos.
         idx_at_solution = find_index(disk_solved, pair)
-
-        # Busco el indice (en la solucion) tal que el "file" cabe
-        # i.e. disk_solved[idx2] = [ -1, <valor >= pair[1] ].
         idx_space, space = search_space(disk_solved, idx_at_solution, pair[1])
 
-        # Si no cabe el file en ningun hueco, vamos al siguiente par.
         if idx_space == -1:
             continue
 
