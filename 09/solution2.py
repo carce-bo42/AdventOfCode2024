@@ -34,20 +34,18 @@ with open(fname) as file:
 disk_solved = copy.deepcopy(disk_original)
 
 count = 0
-for idx, pair in enumerate(reversed(disk_original)):
+for pair in list(filter(lambda x: x[0] != -1, reversed(disk_original))):
 
-    if pair[0] != -1:
+    idx_at_solution = find_index(disk_solved, pair)
+    idx_space, space = search_space(disk_solved, idx_at_solution, pair[1])
 
-        idx_at_solution = find_index(disk_solved, pair)
-        idx_space, space = search_space(disk_solved, idx_at_solution, pair[1])
+    if idx_space == -1:
+        continue
 
-        if idx_space == -1:
-            continue
-
-        disk_solved[idx_space] = [ pair[0], pair[1] ]
-        disk_solved[idx_at_solution][0] = -1
-        if space > pair[1]:
-            disk_solved.insert(idx_space+1, [ -1, space - pair[1] ])
+    disk_solved[idx_space] = [ pair[0], pair[1] ]
+    disk_solved[idx_at_solution][0] = -1
+    if space > pair[1]:
+        disk_solved.insert(idx_space+1, [ -1, space - pair[1] ])
 
 count = 0
 pos = 0
