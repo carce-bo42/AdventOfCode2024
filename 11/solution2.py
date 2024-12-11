@@ -1,4 +1,3 @@
-import functools
 
 def get_memo_key(a, b):
     return f"{a}|{b}"
