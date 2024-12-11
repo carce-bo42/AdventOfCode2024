@@ -1,26 +1,34 @@
-# Voy a descomponer el problema en N iteraciones de M interaciones
-# N < M
-# Cada vez que hago 5 iteraciones, me guardo el resultado de un numero
-# tras esas 5. Luego, hago lo mismo con los numeros que salen de esta.
-# En unas cuantas iteraciones, no debería casi tener que estar calculando
-# nada.
+import functools
 
-def do_weird_fibonacci(times, numbers):
-    
-    if times == 0:
-        return numbers
+def blink(n):
     
     result = []
-    for n in numbers:
-        if n == '0':
-            result.append('1')
-        elif len(n)%2 == 0:
-            result.append(n[0:len(n)//2])
-            result.append(str(int(n[len(n)//2:len(n)])))
-        else:
-            result.append(str(int(n)*2024))
+    
+    if n == '0':
+        result.append('1')
+    elif len(n)%2 == 0:
+        mid_digits = len(n)//2
+        result.append(n[:mid_digits])
+        # str(int()) para quitar 0 a la izq.
+        result.append(str(int(n[mid_digits:])))
+    else:
+        result.append(str(int(n)*2024))
+    
+    return result
 
-    return do_weird_fibonacci(times-1, result)
+# Esto hace que se cacheen las llamadas con argumentos iguales.
+@functools.lru_cache(maxsize=None)
+def blink_n_times(times, n):
+    
+    res = blink(n)
+    
+    if times == 1:
+        return len(res)
+    else:
+        total = blink_n_times(times-1, res[0])
+        if len(res) > 1:
+            total += blink_n_times(times-1, res[1])
+        return total
 
 fname = "input.txt"
 count = 0
@@ -29,19 +37,10 @@ with open(fname) as file:
     for line in file:
         numbers = line.strip().split()
 
-memo = {}
-rr = []
+# No hay que ir iterando el resultado de todas las piedras nivel por nivel.
+# Hay que hacer el problema piedra por piedra.
+count = 0
+for nbr in numbers:
+    count += blink_n_times(75, nbr)
 
-M = 9
-N = 5
-for x in range(0, M):
-    rr = []
-    for n in numbers:
-        if n not in memo.keys():
-            memo[n] = do_weird_fibonacci(N, [n])
-        rr.extend(memo[n])
-    numbers = rr
-
-print(len(memo))
-
-print(len(numbers))
+print(count)

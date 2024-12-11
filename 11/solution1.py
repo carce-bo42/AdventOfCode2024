@@ -16,7 +16,7 @@ def do_weird_fibonacci(times, numbers):
 
     return do_weird_fibonacci(times-1, result)
 
-fname = "input.test2.txt"
+fname = "input.txt"
 count = 0
 numbers = []
 with open(fname) as file:
