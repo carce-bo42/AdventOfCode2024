@@ -49,6 +49,4 @@ memo = {}
 for nbr in numbers:
     count += blink_n_times(75, nbr)
 
-print(memo)
-
 print(count)
