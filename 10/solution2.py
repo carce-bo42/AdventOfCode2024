@@ -6,13 +6,13 @@ def search_hike(x, y, memory):
         memory.append(f"{x}|{y}")
         return
     
-    if x+1 < len(_map) and _map[x+1][y] != '.' and int(_map[x+1][y]) == height+1:
+    if x+1 < len(_map) and int(_map[x+1][y]) == height+1:
         search_hike(x+1, y, memory)
-    if x-1 >= 0 and _map[x-1][y] != '.' and int(_map[x-1][y]) == height+1:
+    if x-1 >= 0 and int(_map[x-1][y]) == height+1:
         search_hike(x-1, y, memory)
-    if y+1 < len(_map[0]) and _map[x][y+1] != '.' and int(_map[x][y+1]) == height+1:
+    if y+1 < len(_map[0]) and int(_map[x][y+1]) == height+1:
         search_hike(x, y+1, memory)
-    if y-1 >= 0 and _map[x][y-1] != '.' and int(_map[x][y-1]) == height+1:
+    if y-1 >= 0 and int(_map[x][y-1]) == height+1:
         search_hike(x, y-1, memory)
     return
 

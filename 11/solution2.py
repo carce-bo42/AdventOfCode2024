@@ -1,5 +1,8 @@
 import functools
 
+def get_memo_key(a, b):
+    return f"{a}|{b}"
+
 def blink(n):
     
     result = []
@@ -16,20 +19,27 @@ def blink(n):
     
     return result
 
-# Esto hace que se cacheen las llamadas con argumentos iguales.
-@functools.cache
-def blink_n_times(times, n):
-    
-    res = blink(n)
-    
-    if times == 1:
-        return len(res)
-    else:
-        total = blink_n_times(times-1, res[0])
-        if len(res) > 1:
-            total += blink_n_times(times-1, res[1])
-        return total
 
+def blink_n_times(times, n):
+
+    # La busqueda de una llave en un diccionario es O(n), el acceso es O(log n)..
+    # Esto me lo dijo Daniel Santo Tomas en una comida de empresa, God Bless
+    
+    key = get_memo_key(times, n)
+
+    try:
+        return memo[key]
+    except KeyError:
+        res = blink(n)
+        if times == 1:
+            memo[key] = len(res)
+        else:
+            total = blink_n_times(times-1, res[0])
+            if len(res) > 1:
+                total += blink_n_times(times-1, res[1])
+            memo[key] = total
+        return memo[key]
+        
 fname = "input.txt"
 count = 0
 numbers = []
@@ -40,6 +50,7 @@ with open(fname) as file:
 # No hay que ir iterando el resultado de todas las piedras nivel por nivel.
 # Hay que hacer el problema piedra por piedra.
 count = 0
+memo = {}
 for nbr in numbers:
     count += blink_n_times(75, nbr)
 
