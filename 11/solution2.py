@@ -19,17 +19,13 @@ def blink(n):
     
     return result
 
-
 def blink_n_times(times, n):
 
-    # La busqueda de una llave en un diccionario es O(n), el acceso es O(log n)..
-    # Esto me lo dijo Daniel Santo Tomas en una comida de empresa, God Bless
-    
     key = get_memo_key(times, n)
-
-    try:
+    
+    if key in memo.keys():
         return memo[key]
-    except KeyError:
+    else:
         res = blink(n)
         if times == 1:
             memo[key] = len(res)
@@ -53,5 +49,7 @@ count = 0
 memo = {}
 for nbr in numbers:
     count += blink_n_times(75, nbr)
+
+print(memo)
 
 print(count)
