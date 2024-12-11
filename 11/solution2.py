@@ -17,7 +17,7 @@ def blink(n):
     return result
 
 # Esto hace que se cacheen las llamadas con argumentos iguales.
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def blink_n_times(times, n):
     
     res = blink(n)
