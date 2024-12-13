@@ -66,7 +66,7 @@ with open(fname) as file:
 
         m = re.match(r"Prize: X=(\d+), Y=(\d+)", sline)
         if m is not None:
-            P = (int(m.group(1))+10000000000000, int(m.group(2))+10000000000000)
+            P = (int(m.group(1)), int(m.group(2)))
 
         if len(vA) == len(vB) == len(P) == 2:
             a_button, b_button = solve_problem(vA, vB, P)
