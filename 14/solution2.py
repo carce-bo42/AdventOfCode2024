@@ -1,5 +1,7 @@
 import re
 import sys
+import numpy as np
+from scipy.spatial.distance import pdist
 
 X_LEN = 101
 Y_LEN = 103
@@ -45,16 +47,16 @@ class _Map:
             for y in range(0, self.y_len):
                 if x == (self.x_len // 2) or y == (self.y_len // 2):
                     continue
-                if _map[x,y] == 0:
+                if self._map[x,y] == 0:
                     continue
                 if x < (self.x_len // 2) and y < (self.y_len // 2):
-                    q1 += _map[x,y]
+                    q1 += self._map[x,y]
                 elif x > (self.x_len // 2) and y < (self.y_len // 2):
-                    q2 += _map[x,y]
+                    q2 += self._map[x,y]
                 elif x < (self.x_len // 2) and y > (self.y_len // 2):
-                    q3 += _map[x,y]
+                    q3 += self._map[x,y]
                 else:
-                    q4 += _map[x,y]
+                    q4 += self._map[x,y]
 
         return q1 * q2 * q3 * q4
 
@@ -65,6 +67,16 @@ class _Map:
                 if _map[x,y] not in {0, 1}:
                     return False
         return True
+
+    def correlation_coefficient(self):
+
+        array = np.array(self._map)
+        non_zero_positions = np.argwhere(array)
+
+        distances = pdist(non_zero_positions, metric='euclidean')
+        distance_variance = np.var(distances)
+
+        return distance_variance
 
 
 # Es un torus. Abajo esta unido por arriba, y a la derecha con la izq.
@@ -88,7 +100,7 @@ class _Map:
 fname = "input.txt"
 # _map[x][y] = (x,y)
 _map = _Map()
-seconds = 100 if sys.argv[1] is None else int(sys.argv[1])
+seconds = 532 if len(sys.argv) != 2 else int(sys.argv[1])
 with open(fname) as file:
     for line in file:
         sline = line.strip()
@@ -98,5 +110,5 @@ with open(fname) as file:
         p_final = ((p[0]+v[0])%X_LEN, ((p[1]+v[1])%Y_LEN))
         _map[*p_final] += 1
 
-if _map.all_numbers_are_one():
-    print(_map)
+print(_map)
+#print(seconds, _map.correlation_coefficient())
