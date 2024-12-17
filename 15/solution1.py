@@ -125,6 +125,3 @@ with open(fname) as file:
 print(_map)
 print(_map.compute_gps_coordinates())
 
-
-
-
