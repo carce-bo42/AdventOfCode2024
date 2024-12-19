@@ -15,7 +15,7 @@ def design_can_be_done(design: str, patterns: frozenset[str]) -> int:
         if design.startswith(pattern):
             valid_patterns.add(pattern)
 
-    # Iterate for all valid_patterns found, see if any return True
+    # Iterate for all valid_patterns found, sum how many actually returned 1.
     count = 0
     for pattern in valid_patterns:
         count += design_can_be_done(design[len(pattern):], patterns)
