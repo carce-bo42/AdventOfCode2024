@@ -137,7 +137,7 @@ if __name__ == "__main__":
         computer = HistorianComputer(rA + bits, rB, rC)
         buf = computer.execute_program(instructions)
 
-        print(f"buf={buf}, rightmost={nth_rightmost_bits(bits, 1 )}")
+        print(f"buf={buf}, rightmost={nth_rightmost_bits(bits, 1)}")
         #print(buf)
         #if buf[digit*2] == instructions[digit]:
         #    potential_bits.setdefault(digit, [])
