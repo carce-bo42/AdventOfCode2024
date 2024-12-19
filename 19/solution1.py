@@ -1,7 +1,7 @@
 import functools
 
 @functools.cache
-def design_can_be_done(design: str, patterns: frozenset[str]):
+def design_can_be_done(design: str, patterns: frozenset[str]) -> bool:
 
     # If theres nothing else to keep parsing, weve succesfully
     # matched a pattern with all slices of the string
