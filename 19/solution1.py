@@ -22,7 +22,7 @@ def design_can_be_done(design: str, patterns: frozenset[str]) -> bool:
 
     return False
 
-def read_file(filename: str) -> tuple[set[str], set[str]]:
+def read_file(filename: str) -> tuple[frozenset[str], frozenset[str]]:
 
     patterns_ended = False
     designs = set()
