@@ -15,9 +15,6 @@ def design_can_be_done(design: str, patterns: frozenset[str]) -> int:
         if design.startswith(pattern):
             valid_patterns.add(pattern)
 
-    if len(valid_patterns) == 0:
-        return 0
-
     # Iterate for all valid_patterns found, see if any return True
     count = 0
     for pattern in valid_patterns:
@@ -36,11 +33,11 @@ def read_file(filename: str) -> tuple[frozenset[str], frozenset[str]]:
                 patterns_ended = True
                 continue
             if not patterns_ended:
-                patterns = set(p.strip() for p in sline.split(","))
+                patterns = frozenset(p.strip() for p in sline.split(","))
             else:
                 designs.add(sline)
 
-    return frozenset(patterns), frozenset(designs)
+    return patterns, frozenset(designs)
 
 if __name__ == "__main__":
 

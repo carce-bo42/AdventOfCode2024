@@ -33,11 +33,11 @@ def read_file(filename: str) -> tuple[frozenset[str], frozenset[str]]:
                 patterns_ended = True
                 continue
             if not patterns_ended:
-                patterns = set(p.strip() for p in sline.split(","))
+                patterns = frozenset(p.strip() for p in sline.split(","))
             else:
                 designs.add(sline)
 
-    return frozenset(patterns), frozenset(designs)
+    return patterns, frozenset(designs)
 
 if __name__ == "__main__":
 
