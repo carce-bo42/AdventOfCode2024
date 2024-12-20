@@ -1,0 +1,54 @@
+# Check the diff between these two functions. For some reason, on problem 2,
+# they outputed different results:
+
+from heapq import heapify, heappop, heappush
+
+DIRECTIONS = {
+    (1, 0),
+    (0, 1),
+    (-1,0),
+    (0,-1),
+}
+
+def dijkstra(points: set[(int,int)], source: tuple[int,int] ) -> dict[(int,int) : int]:
+
+    distances = { source : 0 }
+    pq = [(0, source)]
+    heapify(pq)
+
+    while pq:
+        current_distance, current_node = heappop(pq)
+        if distances[current_node] < current_distance:
+            continue
+        for dir in DIRECTIONS:
+            neighbor = (current_node[0] + dir[0], current_node[1] + dir[1])
+            if neighbor in points:
+                new_dist = current_distance + 1
+                if neighbor not in distances or new_dist < distances[neighbor]:
+                    distances[neighbor] = new_dist
+                    heappush(pq, (new_dist, neighbor))
+
+    return distances
+
+
+
+def dijkstra(points: set[(int,int)], source: tuple[int,int] ) -> dict[(int,int) : int]:
+
+    distances = {node: float("inf") for node in points}
+    distances[source] = 0
+    pq = [(0, source)]
+    heapify(pq)
+
+    while pq:
+        current_distance, current_node = heappop(pq)
+        if distances[current_node] < current_distance:
+            continue
+        for dir in DIRECTIONS:
+            neighbor = (current_node[0] + dir[0], current_node[1] + dir[1])
+            if neighbor in points:
+                new_dist = current_distance + 1
+                if new_dist < distances[neighbor]:
+                    distances[neighbor] = new_dist
+                    heappush(pq, (new_dist, neighbor))
+
+    return { k: v for k, v in distances.items() if v != float("inf") }
