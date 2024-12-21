@@ -20,78 +20,74 @@ DIRECTIONS = {
     (-1,0) : '<',
 }
 
-def dijkstra(
-        points: set[ tuple[int,int] ],
-        source: tuple[int,int]
-    ) -> tuple[ dict[tuple[int,int] : int], dict[tuple[int,int] : list[tuple[int,int]]]]:
-
-    distances = { source : 0 }
-    pq = [(0, source)]
-    heapify(pq)
-
-    while pq:
-        current_distance, current_node = heappop(pq)
-        if distances[current_node] < current_distance:
-            continue
-        for dir in [(1,0), (0,1), (-1,0), (0,-1)]:
-            neighbor = (current_node[0] + dir[0], current_node[1] + dir[1])
-            if neighbor in points:
-                new_dist = current_distance + 1
-                if neighbor not in distances or new_dist < distances[neighbor]:
-                    distances[neighbor] = new_dist
-                    heappush(pq, (new_dist, neighbor))
-
-    predecessors = {node: [] for node in points}
-    for node, distance in distances.items():
-        for dir in [(1,0), (0,1), (-1,0), (0,-1)]:
-            neighbor = (node[0] + dir[0], node[1] + dir[1])
-            if neighbor in points:
-                if distances[neighbor] == distance + 1:
-                    predecessors[neighbor].append(node)
-
-    return distances, predecessors
-
-
-def build_possible_paths(
-        predecessors: dict[tuple[int,int] : list[tuple[int,int]]],
-    ) -> list[dict[tuple[int,int] : tuple[int,int]]]:
-
-    result = []
-    print([[(key, value) for value in values] for key, values in predecessors.items()])
-    for combination in product(*[[(key, value) for value in values] for key, values in predecessors.items()]):
-        result.append({key: value for key, value in combination})
-    return result
-
 # We dissasemble the moves from the end to the start
 def get_moves_from_route(
-        predecessors: dict[tuple[int,int] : tuple[int,int]],
-        src: tuple[int, int],
-        dst: tuple[int,int]
+        sequence: list[tuple[int,int]],
     ) -> str:
 
-    current = dst
     moves = ""
-    while current != src:
-        previous = predecessors[current]
+    current = sequence[0]
+    for next_tile in sequence[1:]:
         # if (0,1) -> (0,2).
         # previous = (0,1). current = (0,2).
         # v = (0, 1) => '>'.
-        v = ((current[0] - previous[0]), current[1] - previous[1])
+        v = ((next_tile[0] - current[0]), next_tile[1] - current[1])
         moves += DIRECTIONS[v]
-        current = previous
+        current = next_tile
 
-    return moves[::-1]+"A"
+    return moves+"A"
+
+
+def add_moves_to_sequence(
+        src: tuple[int, int],
+        delta: int,
+        axis: str,
+        sequence: list[tuple[int, int]]
+    ) -> None:
+
+    if delta != 0:
+        step = 1 if delta > 0 else -1
+        if axis == 'x':
+            for x in range(src[0] + step, src[0] + delta + step, step):
+                sequence.append((x, src[1]))
+        elif axis == 'y':
+            for y in range(src[1] + step, src[1] + delta + step, step):
+                sequence.append((src[0], y))
+
+# So, going up is very costly because we need to start the arm that
+# controls the robot by going left to press the ^  button, and that
+# apparently was a problem ?
+# I started with the order in this function being switched, saw some cases,
+# ended up leaving it like this and the examples worked.
+def get_best_path(
+        points: set[tuple[int,int]],
+        src: tuple[int,int],
+        dst: tuple[int,int],
+    ) -> dict[tuple[int,int] : tuple[int,int]]:
+
+    sequence = [src]
+    dx, dy = (dst[0]-src[0], dst[1]-src[1])
+    if (src[0]+dx, src[1]) in points:
+        add_moves_to_sequence(src, dx, 'x', sequence)
+        new_src = sequence[-1]
+        add_moves_to_sequence(new_src, dy, 'y', sequence)
+    else:
+        add_moves_to_sequence(src, dy, 'y', sequence)
+        new_src = sequence[-1]
+        add_moves_to_sequence(new_src, dx, 'x', sequence)
+
+    return sequence
+
 
 def get_keyboard_moves(sequence: str, keyboard: dict[str : tuple[int,int]]) -> str:
 
     start = keyboard['A']
     points = keyboard.values()
     moves = ""
-    #for char in sequence:
-    _, predecessors = dijkstra(points, start)
-    print(build_possible_paths(predecessors))
-        #moves += get_moves_from_route(predecessors, start, keyboard[char])
-        #start = keyboard[char]
+    for char in sequence:
+        path = get_best_path(points, start, keyboard[char])
+        moves += get_moves_from_route(path)
+        start = keyboard[char]
 
     return moves
 
@@ -109,6 +105,16 @@ def read_file(filename: str) -> list[str]:
 # 029A 1: v<<A>>^A<A>AvA<^AA>A<vAAA>^A
 if __name__ == "__main__":
 
-    password_codes = read_file("input.test.txt")
-    moves = get_keyboard_moves(password_codes[0], PASSWORD_KEYBOARD)
-    # moves = get_keyboard_moves(moves, CONTROL_KEYBOARD)
+    password_codes = read_file("input.txt")
+    complexity = 0
+    for pwd in password_codes:
+        moves = get_keyboard_moves(pwd, PASSWORD_KEYBOARD)
+        print(moves)
+        moves = get_keyboard_moves(moves, CONTROL_KEYBOARD)
+        print(moves)
+        moves = get_keyboard_moves(moves, CONTROL_KEYBOARD)
+        print(moves)
+        print(len(moves),int(pwd[:-1]))
+        complexity += len(moves)*int(pwd[:-1])
+
+    print(complexity)
