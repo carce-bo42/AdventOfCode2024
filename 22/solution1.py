@@ -1,5 +1,8 @@
 prune_mask = 0xffffff
 
+# The "ones digit" is, at most, 9, at least, 0.:
+# 0000, 0001, 0010, 0011, 0100, 0101, 0110, 0111, 1000, 1001 | 1010 -> this ones digit is 0.
+# So we only care about the last 3 binary digits.
 def get_next_secret(secret: int):
 
     secret = ((secret << 6) ^ secret) & prune_mask
