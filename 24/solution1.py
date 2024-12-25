@@ -43,9 +43,27 @@ if __name__ == "__main__":
                 gates.remove(gate)
                 break
     zwires = []
+    xwires = []
+    ywires = []
     for wire, value, in wires.items():
         if wire[0] == 'z':
             zwires.append((wire,value))
-    zwires.sort(reverse=True)
-    print(int("".join([str(s[1]) for s in zwires]),base=2))
+        elif wire[0] == 'x':
+            xwires.append((wire,value))
+        elif wire[0] == 'y':
+            ywires.append((wire,value))
 
+    zwires.sort(reverse=True)
+    xwires.sort(reverse=True)
+    ywires.sort(reverse=True)
+    xbin = "0" + "".join([str(s[1]) for s in xwires])
+    ybin = "0" + "".join([str(s[1]) for s in ywires])
+    zbin = "".join([str(s[1]) for s in zwires])
+    result = int(xbin, base=2) + int(ybin, base=2)
+    result_str = bin(result)[2:]
+    for pos, char in enumerate(result_str):
+        if char != zbin[pos]:
+            print(f"z{len(result_str)-(pos+1)} is wrong")
+
+    print(f"zbin = {zbin}")
+    print(f"res  = {result_str}")
