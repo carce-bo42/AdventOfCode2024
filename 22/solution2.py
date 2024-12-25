@@ -1,8 +1,8 @@
 
 # The ones digit of a number is the digit in the rightmost position of the number.
 # It represents the remainder when the number is divided by 10. For example:
- 
-from functools import cache
+
+from collections import defaultdict, deque
 
 prune_mask = 0xffffff
 
@@ -19,10 +19,10 @@ def get_next_secret(secret: int) -> int:
 
 
 def enumerate_quads(lst: list[int]):
-    
+
     if len(lst) < 4:
         return lst
-    
+
     for pos, _ in enumerate(lst):
         if pos+3 == len(lst)-1:
             break
@@ -52,64 +52,45 @@ def read_file(filename: str) -> list[int]:
 # El problema de hacerlo dinámico es que si en la enesima iteracion encuentras una secuencia,
 # y es la buena, tienes que poder volver atrás para comprobar que funciona ese quad.
 
-# Nos basta con una lista de tuplas. [0] = price [1] = difference. 
+# Nos basta con una lista de tuplas. [0] = price [1] = difference.
 
-def gather_all_merchant_prices(secrets: list[int]) -> list[tuple[tuple[tuple[int,int]], set[int]]]:
-    
-    merchants = []
+def gather_all_merchant_prices(secrets: list[int]) -> dict[tuple[int], int]:
+
+    prices = defaultdict(int)
     for secret in secrets:
-        
-        price_diff = [(secret%10, None)]   
-        candidates = set()
-        for i in range(2000):
+
+        last_prices_gradient = deque()
+        keys_added = set()
+
+        # Do first iteration
+        for i in range(4):
+            last_secret = secret
             secret = get_next_secret(secret)
-            price = secret%10
-            price_diff.append((price, price - price_diff[-1][0]))
-            if price == 9 and i+1 > 3:
-                candidates.add(i+1)
-        
-        merchants.append((tuple(price_diff),candidates))
-        
-    return merchants
+            last_prices_gradient.append((secret%10)-(last_secret%10))
 
-@cache
-def get_idx_of_first_occurence(
-        sequence: tuple[int, int, int, int],
-        diffs: tuple[int]
-    )-> int:
+        key = tuple(last_prices_gradient)
+        prices[key] += secret%10
+        keys_added.add(key)
 
-    for idx, a, b, c, d in enumerate_quads(diffs):
-        if (a,b,c,d) == sequence:
-            return idx
+        # Keep track of all prices for all diff vectors.
+        for i in range(4,2000):
 
-def filter_candidates(
-        merchants: list[tuple[list[tuple[int,int]], list[int]]]
-    ) -> list[tuple[int,int,int,int]]:
-    
-    for m in merchants:
-        true_candidates = []
-        price_diff, candidates = m
-        print(f"total initial candidates{len(candidates)}")
-        for cnd in candidates:
-            sequence = (
-                price_diff[cnd-3][1],
-                price_diff[cnd-2][1],
-                price_diff[cnd-1][1],
-                price_diff[cnd][1]
-            )
-            idx = get_idx_of_first_occurence(sequence, tuple(x[1] for x in price_diff))
-            #print(idx, cnd-3)
-            if idx == cnd-3:
-                true_candidates.append(sequence)
-    
-    return true_candidates
-                
-    
+            last_secret = secret
+            secret = get_next_secret(secret)
+
+            last_prices_gradient.append((secret%10)-(last_secret%10))
+            last_prices_gradient.popleft()
+
+            key = tuple(last_prices_gradient)
+            if key not in keys_added:
+                prices[key] += secret%10
+                keys_added.add(key)
+
+    return prices
+
 
 if __name__ == "__main__":
 
     secrets = read_file("input.txt")
-    merchants = gather_all_merchant_prices(secrets)
-    candidates = filter_candidates(merchants)
-    print(f"total candidates = {len(candidates)}")
-    
+    prices = gather_all_merchant_prices(secrets)
+    print(max(prices.values()))
