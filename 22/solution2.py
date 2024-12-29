@@ -18,17 +18,6 @@ def get_next_secret(secret: int) -> int:
     return secret
 
 
-def enumerate_quads(lst: list[int]):
-
-    if len(lst) < 4:
-        return lst
-
-    for pos, _ in enumerate(lst):
-        if pos+3 == len(lst)-1:
-            break
-        yield pos, lst[pos], lst[pos+1], lst[pos+2], lst[pos+3]
-
-
 def read_file(filename: str) -> list[int]:
 
     secrets = []
@@ -38,21 +27,6 @@ def read_file(filename: str) -> list[int]:
 
     return secrets
 
-# El plan:
-# Para cada matriz de precios:
-# 1. Encontrar los 9 y sacarles la secuencia de diferencias.
-# 2. Filter out las secuencias que sucedan antes que ellos.
-# 3 Añadir esas secuencias al total de secuencias que queremos probar.
-# Calcular el valor asociado a cada uno de estas.
-# Esto no es computacionalmente complejo, pero pide mucha mucha memoria.
-# Tenemos que tener 1 diccionario de ~2k key-values por cada comerciante
-
-# 1 lista de ~1800 diccionarios, cada uno con ~2k valores ~ 1.8k * 2k ~ 400MB
-
-# El problema de hacerlo dinámico es que si en la enesima iteracion encuentras una secuencia,
-# y es la buena, tienes que poder volver atrás para comprobar que funciona ese quad.
-
-# Nos basta con una lista de tuplas. [0] = price [1] = difference.
 
 def gather_all_merchant_prices(secrets: list[int]) -> dict[tuple[int], int]:
 

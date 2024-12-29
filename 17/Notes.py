@@ -58,12 +58,12 @@
 
 # bst 4 --- rB = rA%8
 # bxl 1 --- rB = rB ^ 1
-# cdv 5 --- rC = int( rA / 2**rB )
-# adv 3 --- rA = int( rA / 2**3 )
+# cdv 5 --- rC = rA >> rB
+# adv 3 --- rA = rA >> 3
 # bxl 4 --- rB = rB ^ rA
 # bxc 4 --- rB = rB ^ rC
 # out 5 --- print rB%8
-# jnz 0 --- jump to 0 if A == 0
+# jnz 0 --- jump to 0 if rA != 0
 
 # Lo que es seguro es que para cuando rA == 0.
 # y rA se va dividiendo entre 8.
@@ -83,3 +83,12 @@
 
 # Ojo
 # rango 170000001000000 -> 1000000000
+
+# Importante:
+# Durante una iteracion del bucle, todos los valores derivan de
+# forma directa de rA.
+# rA solo depende de si misma, ya que se va dividiendo entre 8.
+# rB se asigna a rA%8.
+# rC se asigna a rA >> rB.
+# Por lo que no es importante lo que valiesen rB y rC antes de
+# empezar el bucle. No se acarrean valores anteriores.
