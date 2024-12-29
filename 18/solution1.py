@@ -127,9 +127,3 @@ if __name__ == "__main__":
     # Show solution
     print(_map)
 
-
-
-
-
-
-
