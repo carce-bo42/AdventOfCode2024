@@ -42,33 +42,28 @@ ROUTING = {
 
 def dijkstra(points: set[(int,int)], source: tuple[int,int] ) -> dict[(int,int) : int]:
 
-    distances = { source : 0 }
-    pq = [(0, source, ">")]
+    distances = { source : (0, ">") }
+    predecessors = {source: None}
+
+    pq = [(0, source)]
     heapify(pq)
 
     while pq:
 
-        current_cost, current_node, current_direction = heappop(pq)
-        if distances[current_node] < current_cost:
+        current_cost, current_node = heappop(pq)
+        if distances[current_node][0] < current_cost:
             continue
+
+        _, current_direction = distances[current_node]
 
         for vector, direction, cost in ROUTING[current_direction]:
             neighbor = (current_node[0] + vector[0], current_node[1] + vector[1])
             if neighbor in points:
                 new_dist = current_cost + cost
-                if neighbor not in distances or new_dist < distances[neighbor]:
-                    distances[neighbor] = new_dist
-                    heappush(pq, (new_dist, neighbor, direction))
-
-    predecessors = {node: None for node in points}
-
-    # Get list of predecessors
-    for node, distance in distances.items():
-        for vector, direction, cost in ROUTING[current_direction]:
-            neighbor = (node[0] + vector[0], node[1] + vector[1])
-            if neighbor in points:
-                if distances[neighbor] == distance + cost:
-                    predecessors[neighbor] = (node, direction)
+                if neighbor not in distances or new_dist < distances[neighbor][0]:
+                    distances[neighbor] = (new_dist, direction)
+                    predecessors[neighbor] = (current_node, direction)
+                    heappush(pq, (new_dist, neighbor))
 
     return distances, predecessors
 
@@ -99,8 +94,3 @@ if __name__ == "__main__":
     distances, predecessors = dijkstra(points, start)
     print(distances[end])
     print(predecessors)
-
-    # node = (end, ">")
-    # while node[0] != start:
-    #     _map[*node[0]] = node[1]
-    #     node = predecessors[*node[0]]
