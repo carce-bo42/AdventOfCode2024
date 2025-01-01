@@ -75,8 +75,10 @@ def dijkstra(points: set[(int,int)], source: tuple[int,int] ) -> dict[(int,int) 
 
     return distances, predecessors
 
-
-def backtrack_values(
+# Esto te encuentra el camino optimo recorrido.
+# Hay que buscar aqui, que bifurcaciones tienen un coste equivalente.
+# como se hace esto ? ... who the fuck knows
+def find_optimal_path(
         distances: dict[tuple[int,int] : int],
         end: tuple[int,int],
         _map
@@ -102,12 +104,11 @@ def backtrack_values(
                 continue
 
             score = distances[neighbor]
-            if score > max_distance_allowed or score > current_min_score + 1001:
+            if score > max_distance_allowed:
                 continue
 
             score_diff = current_score - score
-            if score_diff in [1, 1001, -999]:
-                #print(score_diff, current_score)
+            if score_diff in [1, 1001]:
                 sits += 1
                 visited.add(neighbor)
                 queue.append(neighbor)
@@ -115,7 +116,7 @@ def backtrack_values(
                 if current_min_score > score:
                     current_min_score = score
 
-    return sits
+    return sits, visited
 
 
 def read_file(filename: str):
@@ -144,9 +145,9 @@ if __name__ == "__main__":
     _map, points, start, end = read_file("input.txt")
     distances, predecessors = dijkstra(points, start)
     print(distances[end])
-    sits = backtrack_values({point : distances[point][0] for point in distances.keys()}, end, _map)
+    sits, visited = find_optimal_path({point : distances[point][0] for point in distances.keys()}, end, _map)
     print(sits)
-    print(_map)
+    #print(_map)
     # for y in range(0,_map.y_len-1):
     #     for x in range(0, _map.x_len-1):
     #         if (x,y) in distances:
